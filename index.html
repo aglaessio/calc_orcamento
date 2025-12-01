@@ -492,17 +492,17 @@
       let text = "";
       
       // Cabeçalho
-      text += `*ORÇAMENTO* 📋\n`;
+      text += `*ORÇAMENTO* \n`;
       text += `==============================\n\n`;
       
       // Informações básicas
-      text += `*Empresa:* ${company} 🏢\n`;
-      text += `*Cliente:* ${client} 👤\n`;
-      text += `*Validade:* ${validity} dias úteis ⏳\n\n`;
+      text += `*Empresa:* ${company} \n`;
+      text += `*Cliente:* ${client} \n`;
+      text += `*Validade:* ${validity} dias úteis \n\n`;
       
       // Itens do orçamento
       if (items.length > 0) {
-        text += `*ITENS ORÇADOS* 📦\n`;
+        text += `*ITENS ORÇADOS* \n`;
         text += `==============================\n`;
         
         items.forEach((it, i) => {
@@ -515,7 +515,7 @@
       }
       
       // Resumo financeiro
-      text += `*RESUMO FINANCEIRO* 💰\n`;
+      text += `*RESUMO FINANCEIRO* \n`;
       text += `==============================\n`;
       text += `Subtotal: ${fmt(subtotal)}\n`;
       
@@ -528,18 +528,18 @@
       }
       
       text += `\n`;
-      text += `*VALOR TOTAL: ${fmt(total >= 0 ? total : 0)}* 💵\n\n`;
+      text += `*VALOR TOTAL: ${fmt(total >= 0 ? total : 0)}* \n\n`;
       
       // Observações
-      text += `*OBSERVAÇÕES* 📝\n`;
+      text += `*OBSERVAÇÕES* \n`;
       text += `==============================\n`;
       text += `${notes}\n\n`;
       
       // Rodapé
       text += `Este orçamento foi gerado automaticamente e possui validade de ${validity} dias.\n\n`;
-      text += `Data de emissão: ${new Date().toLocaleDateString('pt-BR')} 📅\n`;
-      text += `Horário: ${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})} 🕒\n\n`;
-      text += `Agradecemos sua preferência! 🙏`;
+      text += `Data de emissão: ${new Date().toLocaleDateString('pt-BR')} \n`;
+      text += `Horário: ${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})} \n\n`;
+      text += `Agradecemos sua preferência! `;
       
       return text;
     }
