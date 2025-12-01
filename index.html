@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora de Orçamento</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent:#06b6d4; --accent-hover:#0891b2; --muted:#9aa4b2; --glass: rgba(255,255,255,0.03);
+      --radius:16px; --gap:16px; --shadow:0 10px 40px rgba(2,6,23,0.8);
+    }
+    *{box-sizing:border-box;font-family:'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif}
+    body{margin:0;background:linear-gradient(135deg,#071025 0%, #0a1a2e 100%);color:#e6eef6;padding:16px;min-height:100vh}
+    .container{max-width:1100px;margin:0 auto;width:100%}
+    .card{background:linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.03)}
+    h1{margin:0 0 20px;font-size:clamp(20px, 5vw, 24px);font-weight:700;background:linear-gradient(90deg, #06b6d4, #0ea5e9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .flex{display:flex;gap:var(--gap)}
+    .col{flex:1}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:500}
+    input[type="text"], input[type="number"], textarea, select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:var(--glass);color:inherit;transition: all 0.2s;font-size:14px}
+    input:focus, textarea:focus, select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(6, 182, 212, 0.15)}
+    table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
+    th,td{padding:10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.05)}
+    th{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+    .small{font-size:13px;color:var(--muted)}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:12px 16px;border-radius:10px;background:var(--accent);color:#07202a;text-decoration:none;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;font-size:14px;white-space:nowrap}
+    .btn:hover{background:var(--accent-hover);transform:translateY(-2px);box-shadow:0 4px 12px rgba(6, 182, 212, 0.3)}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.08);color:var(--muted)}
+    .btn.ghost:hover{background:rgba(255,255,255,0.05);transform:translateY(-2px);box-shadow:0 4px 12px rgba(255,255,255,0.1)}
+    .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .totals{background:linear-gradient(145deg, rgba(255,255,255,0.02), rgba(0,0,0,0.05));padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .right{text-align:right}
+    .muted{color:var(--muted)}
+    .item-actions{display:flex;gap:6px}
+    .small-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 8px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);cursor:pointer;transition:background 0.2s;color:var(--muted);font-size:11px;white-space:nowrap}
+    .small-btn:hover{background:rgba(255,255,255,0.08)}
+    .empty-state{text-align:center;padding:24px;color:var(--muted);font-style:italic;background:rgba(255,255,255,0.02);border-radius:10px;font-size:14px}
+    .notification{position:fixed;top:16px;right:16px;padding:12px 16px;background:var(--card);border-radius:10px;box-shadow:var(--shadow);z-index:1000;display:none;border-left:4px solid var(--accent);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.05);max-width:calc(100vw - 32px)}
+    .notification.show{display:block;animation:fadeInOut 3s ease-in-out}
+    @keyframes fadeInOut{0%{opacity:0;transform:translateY(-10px)}20%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+    .section-title{font-size:16px;font-weight:600;margin:20px 0 12px;color:#e6eef6;display:flex;align-items:center;gap:8px}
+    .section-title::before{content:'';display:block;width:4px;height:16px;background:var(--accent);border-radius:2px}
+    .total-row{font-size:18px;font-weight:700;color:#e6eef6}
+    .highlight{color:var(--accent)}
+    .input-group{display:flex;flex-direction:column;gap:var(--gap)}
+    .divider{height:1px;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);margin:16px 0;border:none}
+    
+    /* Container de Observações e Totais - Melhorado */
+    .obs-totals-container {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+      align-items: flex-start;
+    }
+    
+    .obs-container {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .totals-container {
+      min-width: 300px;
+      width: 100%;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+      body{padding:12px}
+      .card{padding:16px}
+      
+      .flex{flex-direction:column;gap:12px}
+      
+      table{display:block;overflow-x:auto;white-space:nowrap;font-size:13px}
+      
+      th, td{padding:8px 6px}
+      
+      .actions{justify-content:space-between;width:100%}
+      
+      .btn{font-size:13px;padding:10px 14px}
+      
+      .totals{width:100%}
+      
+      .item-actions{flex-direction:column;gap:4px}
+      .small-btn{padding:4px 6px;font-size:10px}
+      
+      .section-title{font-size:15px;margin:16px 0 10px}
+      
+      /* Ajustes específicos para o container de observações e totais */
+      .obs-totals-container {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .totals-container {
+        min-width: 100%;
+        order: -1; /* Coloca os totais antes das observações em mobile */
+      }
+      
+      .obs-container {
+        width: 100%;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      body{padding:8px}
+      .card{padding:12px}
+      
+      h1{font-size:18px}
+      
+      .btn{width:100%;justify-content:center}
+      
+      .actions{flex-direction:column;gap:8px}
+      .actions .btn{width:100%}
+      
+      th, td{padding:6px 4px;font-size:12px}
+      
+      input[type="text"], input[type="number"], textarea, select{padding:10px 12px;font-size:13px}
+      
+      .notification{top:12px;right:12px;left:12px;max-width:none}
+      
+      /* Ajustes adicionais para telas muito pequenas */
+      .obs-totals-container {
+        gap: 12px;
+      }
+      
+      .totals {
+        padding: 12px;
+      }
+    }
+    
+    @media (max-width: 360px) {
+      .card{padding:10px}
+      
+      h1{font-size:16px}
+      
+      .btn{padding:8px 12px;font-size:12px}
+      
+      th, td{padding:4px 3px;font-size:11px}
+      
+      .section-title{font-size:14px}
+      
+      .total-row{font-size:16px}
+      
+      .obs-totals-container {
+        gap: 10px;
+      }
+    }
+    
+    .print-only{display:none}
+    @media print{
+      body{background:white;color:black;padding:0}
+      .card{box-shadow:none;border:1px solid #ddd}
+      .btn{display:none}
+      .print-only{display:block}
+      .notification{display:none!important}
+    }
+  </style>
+</head>
+<body>
+  <div class="notification" id="notification"></div>
+  
+  <div class="container">
+    <div class="card">
+      <h1>💼 Calculadora de Orçamento</h1>
+
+      <div class="flex" style="margin-top:16px">
+        <div class="col">
+          <label>🏢 Minha empresa</label>
+          <input id="company" type="text" placeholder="Nome da sua empresa" />
+        </div>
+        <div class="col">
+          <label>👤 Cliente</label>
+          <input id="client" type="text" placeholder="Nome do cliente" />
+        </div>
+        <div style="min-width:150px">
+          <label>⏱️ Validade (dias)</label>
+          <input id="validity" type="number" min="1" value="7" />
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <h3 class="section-title">📋 Itens do Orçamento</h3>
+          <div class="actions">
+            <button id="addItem" class="btn">➕ Adicionar item</button>
+            <button id="clearItems" class="btn ghost">🗑️ Limpar</button>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto">
+          <table id="itemsTable" aria-live="polite">
+            <thead>
+              <tr>
+                <th>Descrição</th>
+                <th style="min-width:80px">Qtd</th>
+                <th style="min-width:120px">Preço unit.</th>
+                <th style="min-width:100px">Sub-total</th>
+                <th style="min-width:100px">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody">
+              <!-- itens serão inseridos aqui -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="flex" style="margin-top:16px">
+        <div style="flex:1;min-width:0">
+          <label>📊 Imposto (%)</label>
+          <input id="tax" type="number" min="0" value="0" step="0.1" />
+        </div>
+        <div style="min-width:150px">
+          <label>💸 Desconto (%)</label>
+          <input id="discount" type="number" min="0" value="0" step="0.1" />
+        </div>
+        <div style="min-width:200px">
+          <label>📞 Telefone do cliente (opcional)</label>
+          <input id="phone" type="text" placeholder="5511999887766" />
+        </div>
+      </div>
+
+      <!-- Observações movida para depois do telefone -->
+      <div style="margin-top:16px">
+        <label>📝 Observações</label>
+        <textarea id="notes" rows="4" placeholder="Observações sobre o orçamento"></textarea>
+      </div>
+
+      <!-- Container dos totais -->
+      <div class="totals-container" style="margin-top:16px">
+        <div class="totals">
+          <div style="display:flex;justify-content:space-between"><div class="muted">Subtotal</div><div id="subtotal">R$ 0,00</div></div>
+          <div style="display:flex;justify-content:space-between"><div class="muted">Imposto</div><div id="taxAmount">R$ 0,00</div></div>
+          <div style="display:flex;justify-content:space-between"><div class="muted">Desconto</div><div id="discountAmount">R$ 0,00</div></div>
+          <div class="divider"></div>
+          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:18px" class="total-row"><div>Total</div><div id="total">R$ 0,00</div></div>
+
+          <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+            <button id="copyBtn" class="btn ghost" title="Copiar resumo">📋 Copiar</button>
+            <button id="printBtn" class="btn ghost" title="Imprimir">🖨️ Imprimir</button>
+            <button id="saveBtn" class="btn ghost" title="Salvar">💾 Salvar</button>
+            <button id="whatsappBtn" class="btn">📱 WhatsApp</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Utilitários
+    const fmt = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+    
+    // Função para mostrar notificações
+    function showNotification(message, duration = 3000) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, duration);
+    }
+    
+    // Função para escapar HTML
+    function escapeHtml(text) { 
+      return String(text||'').replace(/[&<>\"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;" }[c])); 
+    }
+
+    // Função para copiar texto para a área de transferência
+    function copyToClipboard(text) {
+      return new Promise((resolve, reject) => {
+        // Método moderno usando Clipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text)
+            .then(() => resolve(true))
+            .catch(err => {
+              console.error('Erro ao copiar com Clipboard API:', err);
+              // Fallback para método antigo
+              fallbackCopyTextToClipboard(text, resolve, reject);
+            });
+        } else {
+          // Fallback para método antigo
+          fallbackCopyTextToClipboard(text, resolve, reject);
+        }
+      });
+    }
+
+    // Fallback para navegadores mais antigos
+    function fallbackCopyTextToClipboard(text, resolve, reject) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) {
+          resolve(true);
+        } else {
+          reject(new Error('Falha ao copiar texto'));
+        }
+      } catch (err) {
+        document.body.removeChild(textArea);
+        reject(err);
+      }
+    }
+
+    // Estado
+    let items = [];
+
+    // Elementos DOM
+    const elements = {
+      itemsBody: document.getElementById('itemsBody'),
+      subtotal: document.getElementById('subtotal'),
+      tax: document.getElementById('tax'),
+      taxAmount: document.getElementById('taxAmount'),
+      discount: document.getElementById('discount'),
+      discountAmount: document.getElementById('discountAmount'),
+      total: document.getElementById('total'),
+      company: document.getElementById('company'),
+      client: document.getElementById('client'),
+      phone: document.getElementById('phone'),
+      notes: document.getElementById('notes'),
+      validity: document.getElementById('validity'),
+      addItem: document.getElementById('addItem'),
+      clearItems: document.getElementById('clearItems'),
+      copyBtn: document.getElementById('copyBtn'),
+      printBtn: document.getElementById('printBtn'),
+      saveBtn: document.getElementById('saveBtn'),
+      whatsappBtn: document.getElementById('whatsappBtn')
+    };
+
+    // Validação de entrada numérica
+    function validateNumberInput(input, min = 0, max = Infinity) {
+      let value = parseFloat(input.value) || 0;
+      if (value < min) value = min;
+      if (value > max) value = max;
+      input.value = value;
+      return value;
+    }
+
+    // Cria uma linha de item na tabela
+    function createRow(item, idx) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input class="desc" data-idx="${idx}" type="text" value="${escapeHtml(item.desc)}" placeholder="Descrição" /></td>
+        <td><input class="qty" data-idx="${idx}" type="number" min="0" step="1" value="${item.qty}" /></td>
+        <td><input class="price" data-idx="${idx}" type="number" min="0" step="0.01" value="${item.price}" /></td>
+        <td class="right item-subtotal">${fmt(item.qty * item.price)}</td>
+        <td class="item-actions">
+          <button class="small-btn del" data-idx="${idx}" title="Remover item">🗑️</button>
+          <button class="small-btn duplicate" data-idx="${idx}" title="Duplicar item">📋</button>
+        </td>
+      `;
+
+      // Handlers para inputs - agora atualizam apenas a linha específica
+      tr.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', e => {
+          const i = Number(e.target.dataset.idx);
+          if (e.target.classList.contains('desc')) {
+            items[i].desc = e.target.value;
+          }
+          if (e.target.classList.contains('qty')) {
+            items[i].qty = validateNumberInput(e.target, 0);
+          }
+          if (e.target.classList.contains('price')) {
+            items[i].price = validateNumberInput(e.target, 0);
+          }
+          // Atualiza apenas o subtotal desta linha
+          updateRowSubtotal(i);
+          // Atualiza totais gerais
+          updateTotals();
+          saveToLocalStorage();
+        });
+        
+        // Foco no próximo campo ao pressionar Enter
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Enter') {
+            const inputs = Array.from(tr.querySelectorAll('input'));
+            const currentIndex = inputs.indexOf(e.target);
+            if (currentIndex < inputs.length - 1) {
+              inputs[currentIndex + 1].focus();
+            } else {
+              // Se for o último campo, adiciona um novo item
+              addNewItem();
+            }
+          }
+        });
+      });
+      
+      // Handler para remover item
+      tr.querySelector('.del').addEventListener('click', () => { 
+        items.splice(idx, 1); 
+        renderTable();
+        showNotification('Item removido');
+      });
+      
+      // Handler para duplicar item
+      tr.querySelector('.duplicate').addEventListener('click', () => { 
+        const originalItem = items[idx];
+        items.splice(idx + 1, 0, {...originalItem});
+        renderTable();
+        showNotification('Item duplicado');
+      });
+
+      return tr;
+    }
+
+    // Atualiza apenas o subtotal de uma linha específica
+    function updateRowSubtotal(idx) {
+      const row = elements.itemsBody.children[idx];
+      if (!row) return;
+      
+      const item = items[idx];
+      const subtotalCell = row.querySelector('.item-subtotal');
+      if (subtotalCell) {
+        subtotalCell.textContent = fmt(item.qty * item.price);
+      }
+    }
+
+    // Renderiza apenas a tabela (quando a estrutura muda)
+    function renderTable() {
+      // Limpa e reconstrói a tabela
+      elements.itemsBody.innerHTML = '';
+      
+      if (items.length === 0) {
+        elements.itemsBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state">
+              📝 Nenhum item adicionado. Clique em "Adicionar item" para começar.
+            </td>
+          </tr>
+        `;
+      } else {
+        items.forEach((it, i) => elements.itemsBody.appendChild(createRow(it, i)));
+      }
+      
+      // Atualiza totais
+      updateTotals();
+    }
+
+    // Atualiza apenas os totais
+    function updateTotals() {
+      // Calcula totais
+      const subtotal = items.reduce((s, it) => s + (it.qty * it.price), 0);
+      const taxPerc = Number(elements.tax.value) || 0;
+      const discountPerc = Number(elements.discount.value) || 0;
+      const taxAmount = subtotal * (taxPerc / 100);
+      const discountAmount = subtotal * (discountPerc / 100);
+      const total = subtotal + taxAmount - discountAmount;
+
+      // Atualiza elementos de exibição
+      elements.subtotal.textContent = fmt(subtotal);
+      elements.taxAmount.textContent = fmt(taxAmount);
+      elements.discountAmount.textContent = fmt(discountAmount);
+      elements.total.textContent = fmt(total >= 0 ? total : 0);
+    }
+
+    // Adiciona um novo item
+    function addNewItem() {
+      items.push({ desc: '', qty: 1, price: 0 });
+      renderTable();
+      
+      // Foca no campo de descrição do novo item
+      setTimeout(() => {
+        const lastInput = elements.itemsBody.lastElementChild?.querySelector('.desc');
+        if (lastInput) lastInput.focus();
+      }, 10);
+    }
+
+    // Constrói o texto do resumo para WhatsApp
+    function buildSummaryText() {
+      const company = elements.company.value || 'Não informado';
+      const client = elements.client.value || 'Não informado';
+      const validity = Number(elements.validity.value) || 7;
+      const notes = elements.notes.value || 'Nenhuma observação adicional.';
+
+      const subtotal = items.reduce((s, it) => s + (it.qty * it.price), 0);
+      const taxPerc = Number(elements.tax.value) || 0;
+      const discountPerc = Number(elements.discount.value) || 0;
+      const taxAmount = subtotal * (taxPerc / 100);
+      const discountAmount = subtotal * (discountPerc / 100);
+      const total = subtotal + taxAmount - discountAmount;
+
+      // Usar emojis mais compatíveis e garantir codificação UTF-8
+      let text = "";
+      
+      // Cabeçalho
+      text += `*ORÇAMENTO* 📋\n`;
+      text += `==============================\n\n`;
+      
+      // Informações básicas
+      text += `*Empresa:* ${company} 🏢\n`;
+      text += `*Cliente:* ${client} 👤\n`;
+      text += `*Validade:* ${validity} dias úteis ⏳\n\n`;
+      
+      // Itens do orçamento
+      if (items.length > 0) {
+        text += `*ITENS ORÇADOS* 📦\n`;
+        text += `==============================\n`;
+        
+        items.forEach((it, i) => {
+          const itemTotal = it.qty * it.price;
+          text += `${i + 1}. ${it.desc || 'Item sem descrição'}\n`;
+          text += `   • Quantidade: ${it.qty}\n`;
+          text += `   • Preço unitário: ${fmt(it.price)}\n`;
+          text += `   → Subtotal: ${fmt(itemTotal)}\n\n`;
+        });
+      }
+      
+      // Resumo financeiro
+      text += `*RESUMO FINANCEIRO* 💰\n`;
+      text += `==============================\n`;
+      text += `Subtotal: ${fmt(subtotal)}\n`;
+      
+      if (taxPerc > 0) {
+        text += `Imposto (${taxPerc}%): ${fmt(taxAmount)}\n`;
+      }
+      
+      if (discountPerc > 0) {
+        text += `Desconto (${discountPerc}%): ${fmt(discountAmount)}\n`;
+      }
+      
+      text += `\n`;
+      text += `*VALOR TOTAL: ${fmt(total >= 0 ? total : 0)}* 💵\n\n`;
+      
+      // Observações
+      text += `*OBSERVAÇÕES* 📝\n`;
+      text += `==============================\n`;
+      text += `${notes}\n\n`;
+      
+      // Rodapé
+      text += `Este orçamento foi gerado automaticamente e possui validade de ${validity} dias.\n\n`;
+      text += `Data de emissão: ${new Date().toLocaleDateString('pt-BR')} 📅\n`;
+      text += `Horário: ${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})} 🕒\n\n`;
+      text += `Agradecemos sua preferência! 🙏`;
+      
+      return text;
+    }
+
+    // Salva dados no localStorage
+    function saveToLocalStorage() {
+      const data = {
+        company: elements.company.value,
+        client: elements.client.value,
+        validity: elements.validity.value,
+        tax: elements.tax.value,
+        discount: elements.discount.value,
+        phone: elements.phone.value,
+        notes: elements.notes.value,
+        items: items
+      };
+      localStorage.setItem('budgetCalculatorData', JSON.stringify(data));
+    }
+
+    // Carrega dados do localStorage
+    function loadFromLocalStorage() {
+      const savedData = localStorage.getItem('budgetCalculatorData');
+      if (savedData) {
+        try {
+          const data = JSON.parse(savedData);
+          elements.company.value = data.company || '';
+          elements.client.value = data.client || '';
+          elements.validity.value = data.validity || 7;
+          elements.tax.value = data.tax || 0;
+          elements.discount.value = data.discount || 0;
+          elements.phone.value = data.phone || '';
+          elements.notes.value = data.notes || '';
+          items = data.items || [];
+          renderTable();
+          showNotification('Dados recuperados do armazenamento local');
+        } catch (e) {
+          console.error('Erro ao carregar dados salvos:', e);
+        }
+      }
+    }
+
+    // Exporta dados para arquivo
+    function exportData() {
+      const data = {
+        company: elements.company.value,
+        client: elements.client.value,
+        validity: elements.validity.value,
+        tax: elements.tax.value,
+        discount: elements.discount.value,
+        phone: elements.phone.value,
+        notes: elements.notes.value,
+        items: items,
+        summary: buildSummaryText(),
+        timestamp: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `orcamento-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showNotification('Orçamento salvo como arquivo');
+    }
+
+    // Abre o WhatsApp com a mensagem pré-preenchida
+    function openWhatsAppWithMessage() {
+      const phone = (elements.phone.value || '').replace(/\D/g, '');
+      const text = buildSummaryText();
+      
+      // Codificar o texto para URL
+      const encodedText = encodeURIComponent(text);
+      
+      let url = '';
+      
+      if (phone.length >= 8) {
+        // Se tem telefone, abre conversa específica com mensagem
+        url = `https://wa.me/${phone}?text=${encodedText}`;
+      } else {
+        // Se não tem telefone, abre WhatsApp com mensagem pronta
+        url = `https://wa.me/?text=${encodedText}`;
+      }
+      
+      // Abre em uma nova janela
+      const newWindow = window.open(url, '_blank');
+      
+      if (newWindow) {
+        showNotification('WhatsApp aberto com a mensagem pré-preenchida!');
+      } else {
+        showNotification('WhatsApp aberto! A mensagem foi copiada para sua área de transferência.');
+        
+        // Se a janela não abriu, copia para área de transferência como fallback
+        copyToClipboard(text)
+          .then(() => {
+            showNotification('Mensagem copiada! Cole no WhatsApp (Ctrl+V).');
+          })
+          .catch(err => {
+            console.error('Erro ao copiar:', err);
+            showNotification('Erro ao copiar automaticamente. Copie manualmente a mensagem.');
+          });
+      }
+    }
+
+    // Event Listeners
+    elements.addItem.addEventListener('click', addNewItem);
+    
+    elements.clearItems.addEventListener('click', () => { 
+      if (items.length === 0 || confirm('Tem certeza que deseja limpar todos os itens?')) { 
+        items = []; 
+        renderTable();
+        showNotification('Todos os itens foram removidos');
+      }
+    });
+    
+    elements.tax.addEventListener('input', updateTotals);
+    elements.discount.addEventListener('input', updateTotals);
+    
+    elements.copyBtn.addEventListener('click', () => {
+      const summary = buildSummaryText();
+      copyToClipboard(summary)
+        .then(() => {
+          showNotification('Resumo copiado para a área de transferência!');
+        })
+        .catch(err => {
+          console.error('Erro ao copiar:', err);
+          showNotification('Erro ao copiar. Tente novamente ou use Ctrl+C manualmente.');
+        });
+    });
+
+    elements.printBtn.addEventListener('click', () => {
+      window.print();
+    });
+    
+    elements.saveBtn.addEventListener('click', exportData);
+
+    elements.whatsappBtn.addEventListener('click', () => {
+      openWhatsAppWithMessage();
+    });
+
+    // Inicialização
+    function init() {
+      // Carrega dados salvos
+      loadFromLocalStorage();
+      
+      // Adiciona um item de exemplo se não houver dados salvos
+      if (items.length === 0) {
+        items.push({ desc: 'Serviço de exemplo', qty: 1, price: 150.00 });
+        renderTable();
+      }
+      
+      // Adiciona evento para salvar automaticamente quando campos são alterados
+      ['company', 'client', 'validity', 'phone', 'notes'].forEach(id => {
+        document.getElementById(id).addEventListener('input', saveToLocalStorage);
+      });
+    }
+
+    // Inicia a aplicação
+    init();
+  </script>
+</body>
+</html>
