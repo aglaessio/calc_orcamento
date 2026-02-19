@@ -694,9 +694,6 @@
         
         // Atualiza os totais
         updateTotals();
-        
-        // Salva no localStorage
-        saveToLocalStorage();
       });
       
       priceInput.addEventListener('input', function() {
@@ -724,7 +721,6 @@
           }
           updateRowSubtotal(i);
           updateTotals();
-          saveToLocalStorage();
         });
       });
       
@@ -883,40 +879,6 @@
       return text;
     }
 
-    function saveToLocalStorage() {
-      const data = {
-        company: elements.company.value,
-        client: elements.client.value,
-        validity: elements.validity.value,
-        tax: elements.tax.value,
-        discount: elements.discount.value,
-        phone: elements.phone.value,
-        notes: elements.notes.value,
-        items: items
-      };
-      localStorage.setItem('stiBudgetData', JSON.stringify(data));
-    }
-
-    function loadFromLocalStorage() {
-      const savedData = localStorage.getItem('stiBudgetData');
-      if (savedData) {
-        try {
-          const data = JSON.parse(savedData);
-          elements.company.value = data.company || 'STI - Soluções Técnicas Integradas';
-          elements.client.value = data.client || '';
-          elements.validity.value = data.validity || 7;
-          elements.tax.value = data.tax || 0;
-          elements.discount.value = data.discount || 0;
-          elements.phone.value = data.phone || '';
-          elements.notes.value = data.notes || '';
-          items = data.items || [];
-          renderTable();
-        } catch (e) {
-          console.error('Erro ao carregar dados salvos:', e);
-        }
-      }
-    }
-
     function exportData() {
       const data = {
         company: elements.company.value,
@@ -978,15 +940,8 @@
       }
     });
     
-    elements.tax.addEventListener('input', () => {
-      updateTotals();
-      saveToLocalStorage();
-    });
-    
-    elements.discount.addEventListener('input', () => {
-      updateTotals();
-      saveToLocalStorage();
-    });
+    elements.tax.addEventListener('input', updateTotals);
+    elements.discount.addEventListener('input', updateTotals);
     
     elements.copyBtn.addEventListener('click', () => {
       copyToClipboard(buildSummaryText())
@@ -1000,18 +955,11 @@
     
     elements.whatsappBtn.addEventListener('click', openWhatsAppWithMessage);
 
+    // Inicialização
     function init() {
-      loadFromLocalStorage();
-      
-      if (items.length === 0) {
-        items.push({ desc: '', qty: 1, price: 0.00 });
-        renderTable();
-      }
-      
-      // Adicionar eventos para salvar no localStorage
-      ['company', 'client', 'validity', 'phone', 'notes'].forEach(id => {
-        document.getElementById(id).addEventListener('input', saveToLocalStorage);
-      });
+      // Adiciona um item inicial vazio
+      items.push({ desc: '', qty: 1, price: 0.00 });
+      renderTable();
     }
 
     init();
