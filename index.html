@@ -3,49 +3,358 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calculadora de Orçamento</title>
+  <title>STI - Calculadora de Orçamento</title>
   <style>
-    :root{
-      --bg:#0f1724; --card:#0b1220; --accent:#06b6d4; --accent-hover:#0891b2; --muted:#9aa4b2; --glass: rgba(255,255,255,0.03);
-      --radius:16px; --gap:16px; --shadow:0 10px 40px rgba(2,6,23,0.8);
+    :root {
+      --primary: #0056A6;
+      --primary-dark: #003d7a;
+      --secondary: #4A4A4A;
+      --accent: #00A86B;
+      --light: #f8f9fa;
+      --gray: #6c757d;
+      --bg: #0f1724;
+      --card: #0b1220;
+      --accent-hover: #0891b2;
+      --muted: #9aa4b2;
+      --glass: rgba(255,255,255,0.03);
+      --radius: 16px;
+      --gap: 16px;
+      --shadow: 0 10px 40px rgba(2,6,23,0.8);
     }
-    *{box-sizing:border-box;font-family:'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif}
-    body{margin:0;background:linear-gradient(135deg,#071025 0%, #0a1a2e 100%);color:#e6eef6;padding:16px;min-height:100vh}
-    .container{max-width:1100px;margin:0 auto;width:100%}
-    .card{background:linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.03)}
-    h1{margin:0 0 20px;font-size:clamp(20px, 5vw, 24px);font-weight:700;background:linear-gradient(90deg, #06b6d4, #0ea5e9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .flex{display:flex;gap:var(--gap)}
-    .col{flex:1}
-    label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:500}
-    input[type="text"], input[type="number"], textarea, select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:var(--glass);color:inherit;transition: all 0.2s;font-size:14px}
-    input:focus, textarea:focus, select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(6, 182, 212, 0.15)}
-    table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
-    th,td{padding:10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.05)}
-    th{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
-    .small{font-size:13px;color:var(--muted)}
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:12px 16px;border-radius:10px;background:var(--accent);color:#07202a;text-decoration:none;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;font-size:14px;white-space:nowrap}
-    .btn:hover{background:var(--accent-hover);transform:translateY(-2px);box-shadow:0 4px 12px rgba(6, 182, 212, 0.3)}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.08);color:var(--muted)}
-    .btn.ghost:hover{background:rgba(255,255,255,0.05);transform:translateY(-2px);box-shadow:0 4px 12px rgba(255,255,255,0.1)}
-    .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .totals{background:linear-gradient(145deg, rgba(255,255,255,0.02), rgba(0,0,0,0.05));padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-    .right{text-align:right}
-    .muted{color:var(--muted)}
-    .item-actions{display:flex;gap:6px}
-    .small-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 8px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);cursor:pointer;transition:background 0.2s;color:var(--muted);font-size:11px;white-space:nowrap}
-    .small-btn:hover{background:rgba(255,255,255,0.08)}
-    .empty-state{text-align:center;padding:24px;color:var(--muted);font-style:italic;background:rgba(255,255,255,0.02);border-radius:10px;font-size:14px}
-    .notification{position:fixed;top:16px;right:16px;padding:12px 16px;background:var(--card);border-radius:10px;box-shadow:var(--shadow);z-index:1000;display:none;border-left:4px solid var(--accent);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.05);max-width:calc(100vw - 32px)}
-    .notification.show{display:block;animation:fadeInOut 3s ease-in-out}
-    @keyframes fadeInOut{0%{opacity:0;transform:translateY(-10px)}20%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
-    .section-title{font-size:16px;font-weight:600;margin:20px 0 12px;color:#e6eef6;display:flex;align-items:center;gap:8px}
-    .section-title::before{content:'';display:block;width:4px;height:16px;background:var(--accent);border-radius:2px}
-    .total-row{font-size:18px;font-weight:700;color:#e6eef6}
-    .highlight{color:var(--accent)}
-    .input-group{display:flex;flex-direction:column;gap:var(--gap)}
-    .divider{height:1px;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);margin:16px 0;border:none}
     
-    /* Container de Observações e Totais - Melhorado */
+    * {
+      box-sizing: border-box;
+      font-family: 'Montserrat', 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #071025 0%, #0a1a2e 100%);
+      color: #e6eef6;
+      padding: 16px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    /* Header da STI */
+    .company-header {
+      background: linear-gradient(145deg, rgba(0,86,166,0.2), rgba(0,86,166,0.05));
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(0,86,166,0.3);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .company-logo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .company-logo-img {
+      height: 60px;
+      width: auto;
+      filter: drop-shadow(0 4px 8px rgba(0,86,166,0.3));
+    }
+    
+    .company-info h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #06b6d4, #0ea5e9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .company-info p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    
+    .card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    
+    h1 {
+      margin: 0 0 20px;
+      font-size: clamp(20px, 5vw, 24px);
+      font-weight: 700;
+      background: linear-gradient(90deg, #06b6d4, #0ea5e9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .flex {
+      display: flex;
+      gap: var(--gap);
+    }
+    
+    .col {
+      flex: 1;
+    }
+    
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    input[type="text"], input[type="number"], textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: var(--glass);
+      color: inherit;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,86,166,0.15);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+    
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    th {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,86,166,0.3);
+    }
+    
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+    }
+    
+    .btn.ghost:hover {
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255,255,255,0.1);
+    }
+    
+    .btn-accent {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-accent:hover {
+      background: #008f55;
+      box-shadow: 0 4px 12px rgba(0,168,107,0.3);
+    }
+    
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .totals {
+      background: linear-gradient(145deg, rgba(0,86,166,0.1), rgba(0,0,0,0.05));
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,86,166,0.2);
+    }
+    
+    .right {
+      text-align: right;
+    }
+    
+    .muted {
+      color: var(--muted);
+    }
+    
+    .item-actions {
+      display: flex;
+      gap: 6px;
+    }
+    
+    .small-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 8px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: background 0.2s;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    
+    .small-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-style: italic;
+      background: rgba(255,255,255,0.02);
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    
+    .notification {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      padding: 12px 16px;
+      background: var(--card);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      display: none;
+      border-left: 4px solid var(--accent);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.05);
+      max-width: calc(100vw - 32px);
+    }
+    
+    .notification.show {
+      display: block;
+      animation: fadeInOut 3s ease-in-out;
+    }
+    
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(-10px); }
+      20% { opacity: 1; transform: translateY(0); }
+      80% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-10px); }
+    }
+    
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 20px 0 12px;
+      color: #e6eef6;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .section-title::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 16px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+    
+    .total-row {
+      font-size: 18px;
+      font-weight: 700;
+      color: #e6eef6;
+    }
+    
+    .highlight {
+      color: var(--accent);
+    }
+    
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+    
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      margin: 16px 0;
+      border: none;
+    }
+    
+    /* Info da empresa no rodapé do orçamento */
+    .company-footer-info {
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(0,86,166,0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(0,86,166,0.2);
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: space-between;
+    }
+    
+    .company-footer-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .company-footer-item i {
+      color: var(--primary);
+      width: 16px;
+    }
+    
     .obs-totals-container {
       display: flex;
       gap: 16px;
@@ -59,121 +368,81 @@
     }
     
     .totals-container {
-      min-width: 300px;
+      min-width: 350px;
       width: 100%;
     }
     
     /* Responsividade */
     @media (max-width: 768px) {
-      body{padding:12px}
-      .card{padding:16px}
-      
-      .flex{flex-direction:column;gap:12px}
-      
-      table{display:block;overflow-x:auto;white-space:nowrap;font-size:13px}
-      
-      th, td{padding:8px 6px}
-      
-      .actions{justify-content:space-between;width:100%}
-      
-      .btn{font-size:13px;padding:10px 14px}
-      
-      .totals{width:100%}
-      
-      .item-actions{flex-direction:column;gap:4px}
-      .small-btn{padding:4px 6px;font-size:10px}
-      
-      .section-title{font-size:15px;margin:16px 0 10px}
-      
-      /* Ajustes específicos para o container de observações e totais */
-      .obs-totals-container {
-        flex-direction: column;
-        gap: 16px;
-      }
-      
-      .totals-container {
-        min-width: 100%;
-        order: -1; /* Coloca os totais antes das observações em mobile */
-      }
-      
-      .obs-container {
-        width: 100%;
-      }
+      body { padding: 12px; }
+      .card { padding: 16px; }
+      .company-header { flex-direction: column; align-items: flex-start; }
+      .flex { flex-direction: column; gap: 12px; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+      .actions { justify-content: space-between; width: 100%; }
+      .btn { font-size: 13px; padding: 10px 14px; }
+      .totals { width: 100%; }
+      .item-actions { flex-direction: column; gap: 4px; }
+      .obs-totals-container { flex-direction: column; }
+      .totals-container { min-width: 100%; order: -1; }
     }
     
     @media (max-width: 480px) {
-      body{padding:8px}
-      .card{padding:12px}
-      
-      h1{font-size:18px}
-      
-      .btn{width:100%;justify-content:center}
-      
-      .actions{flex-direction:column;gap:8px}
-      .actions .btn{width:100%}
-      
-      th, td{padding:6px 4px;font-size:12px}
-      
-      input[type="text"], input[type="number"], textarea, select{padding:10px 12px;font-size:13px}
-      
-      .notification{top:12px;right:12px;left:12px;max-width:none}
-      
-      /* Ajustes adicionais para telas muito pequenas */
-      .obs-totals-container {
-        gap: 12px;
-      }
-      
-      .totals {
-        padding: 12px;
-      }
+      body { padding: 8px; }
+      .card { padding: 12px; }
+      h1 { font-size: 18px; }
+      .btn { width: 100%; justify-content: center; }
+      .actions { flex-direction: column; }
+      .company-footer-info { flex-direction: column; gap: 10px; }
     }
     
-    @media (max-width: 360px) {
-      .card{padding:10px}
-      
-      h1{font-size:16px}
-      
-      .btn{padding:8px 12px;font-size:12px}
-      
-      th, td{padding:4px 3px;font-size:11px}
-      
-      .section-title{font-size:14px}
-      
-      .total-row{font-size:16px}
-      
-      .obs-totals-container {
-        gap: 10px;
-      }
-    }
+    .print-only { display: none; }
     
-    .print-only{display:none}
-    @media print{
-      body{background:white;color:black;padding:0}
-      .card{box-shadow:none;border:1px solid #ddd}
-      .btn{display:none}
-      .print-only{display:block}
-      .notification{display:none!important}
+    @media print {
+      body { background: white; color: black; padding: 0; }
+      .card { box-shadow: none; border: 1px solid #ddd; }
+      .btn { display: none; }
+      .print-only { display: block; }
+      .notification { display: none !important; }
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="notification" id="notification"></div>
   
   <div class="container">
+    <!-- Cabeçalho da STI -->
+    <div class="company-header">
+      <div class="company-logo">
+        <!-- <img src="https://i.ibb.co/8wFNWHR/STI-1.png" 
+             alt="STI - Soluções Técnicas Integradas" 
+             class="company-logo-img"
+             onerror="this.onerror=null; this.style.display='none'; this.parentElement.innerHTML+='<div style=\'font-size:40px; font-weight:700; color:#0056A6;\'>STI</div>'"> -->
+      </div>
+      <div class="company-info">
+        <h2>STI – Soluções Técnicas Integradas</h2>
+        <p><i class="fas fa-map-marker-alt" style="margin-right: 5px;"></i> Rua Eloy de Assis Fabris, 452 - Loja 04 - Novo Mundo, Curitiba - PR</p>
+        <p><i class="fas fa-phone" style="margin-right: 5px;"></i> (41) 98808-3006 | <i class="fas fa-envelope" style="margin-right: 5px;"></i> contato@sti.seg.br</p>
+        <p><i class="fas fa-id-card" style="margin-right: 5px;"></i> CNPJ: 63.897.187/0001-98</p>
+      </div>
+    </div>
+
     <div class="card">
-      <h1>💼 Calculadora de Orçamento</h1>
+      <h1><i class="fas fa-calculator" style="margin-right: 10px; color: #00A86B;"></i>Calculadora de Orçamento</h1>
 
       <div class="flex" style="margin-top:16px">
         <div class="col">
-          <label>🏢 Minha empresa</label>
-          <input id="company" type="text" placeholder="Nome da sua empresa" />
+          <label><i class="fas fa-building" style="margin-right: 5px;"></i>Minha empresa (STI)</label>
+          <input id="company" type="text" placeholder="STI - Soluções Técnicas Integradas" value="STI - Soluções Técnicas Integradas" />
         </div>
         <div class="col">
-          <label>👤 Cliente</label>
+          <label><i class="fas fa-user" style="margin-right: 5px;"></i>Cliente</label>
           <input id="client" type="text" placeholder="Nome do cliente" />
         </div>
         <div style="min-width:150px">
-          <label>⏱️ Validade (dias)</label>
+          <label><i class="fas fa-hourglass-half" style="margin-right: 5px;"></i>Validade (dias)</label>
           <input id="validity" type="number" min="1" value="7" />
         </div>
       </div>
@@ -182,10 +451,10 @@
 
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <h3 class="section-title">📋 Itens do Orçamento</h3>
+          <h3 class="section-title"><i class="fas fa-clipboard-list" style="margin-right: 8px; color: var(--primary);"></i>Itens do Orçamento</h3>
           <div class="actions">
-            <button id="addItem" class="btn">➕ Adicionar item</button>
-            <button id="clearItems" class="btn ghost">🗑️ Limpar</button>
+            <button id="addItem" class="btn"><i class="fas fa-plus-circle"></i> Adicionar item</button>
+            <button id="clearItems" class="btn ghost"><i class="fas fa-trash-alt"></i> Limpar</button>
           </div>
         </div>
 
@@ -209,22 +478,22 @@
 
       <div class="flex" style="margin-top:16px">
         <div style="flex:1;min-width:0">
-          <label>📊 Imposto (%)</label>
-          <input id="tax" type="number" min="0" value="0" step="0.1" />
+          <label><i class="fas fa-percent" style="margin-right: 5px;"></i>Imposto (%)</label>
+          <input id="tax" type="number" min="0" value="0" step="0.01" />
         </div>
         <div style="min-width:150px">
-          <label>💸 Desconto (%)</label>
-          <input id="discount" type="number" min="0" value="0" step="0.1" />
+          <label><i class="fas fa-tag" style="margin-right: 5px;"></i>Desconto (%)</label>
+          <input id="discount" type="number" min="0" value="0" step="0.01" />
         </div>
         <div style="min-width:200px">
-          <label>📞 Telefone do cliente (opcional)</label>
-          <input id="phone" type="text" placeholder="5511999887766" />
+          <label><i class="fas fa-phone-alt" style="margin-right: 5px;"></i>Telefone do cliente</label>
+          <input id="phone" type="text" placeholder="(41) 98808-3006" />
         </div>
       </div>
 
-      <!-- Observações movida para depois do telefone -->
+      <!-- Observações -->
       <div style="margin-top:16px">
-        <label>📝 Observações</label>
+        <label><i class="fas fa-edit" style="margin-right: 5px;"></i>Observações</label>
         <textarea id="notes" rows="4" placeholder="Observações sobre o orçamento"></textarea>
       </div>
 
@@ -238,11 +507,27 @@
           <div style="display:flex;justify-content:space-between;font-weight:700;font-size:18px" class="total-row"><div>Total</div><div id="total">R$ 0,00</div></div>
 
           <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
-            <button id="copyBtn" class="btn ghost" title="Copiar resumo">📋 Copiar</button>
-            <button id="printBtn" class="btn ghost" title="Imprimir">🖨️ Imprimir</button>
-            <button id="saveBtn" class="btn ghost" title="Salvar .json">💾 Exportar .json</button>
-            <button id="whatsappBtn" class="btn">📱 WhatsApp</button>
+            <button id="copyBtn" class="btn ghost" title="Copiar resumo"><i class="fas fa-copy"></i> Copiar</button>
+            <button id="printBtn" class="btn ghost" title="Imprimir"><i class="fas fa-print"></i> Imprimir</button>
+            <button id="saveBtn" class="btn ghost" title="Salvar .json"><i class="fas fa-download"></i> Exportar</button>
+            <button id="whatsappBtn" class="btn btn-accent"><i class="fab fa-whatsapp"></i> WhatsApp</button>
           </div>
+        </div>
+      </div>
+      
+      <!-- Informações da STI no rodapé -->
+      <div class="company-footer-info">
+        <div class="company-footer-item">
+          <i class="fas fa-shield-alt"></i>
+          <span>Garantia: 90 dias para serviços | 1 ano para equipamentos</span>
+        </div>
+        <div class="company-footer-item">
+          <i class="fas fa-clock"></i>
+          <span>Atendimento: Resposta em até 10 minutos</span>
+        </div>
+        <div class="company-footer-item">
+          <i class="fas fa-file-signature"></i>
+          <span>Solicite seu orçamento personalizado</span>
         </div>
       </div>
     </div>
@@ -252,6 +537,37 @@
     // Utilitários
     const fmt = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
     
+    // Função para formatar valor monetário para exibição
+    function formatMoneyInput(value) {
+      if (!value) return '';
+      
+      // Remove tudo que não for dígito
+      let digits = value.toString().replace(/\D/g, '');
+      
+      // Se não tiver dígitos, retorna vazio
+      if (digits.length === 0) return '';
+      
+      // Converte para número com 2 casas decimais
+      let number = parseInt(digits) / 100;
+      
+      // Formata como moeda brasileira sem o símbolo R$
+      return number.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    
+    // Função para converter string formatada para número
+    function parseMoneyToNumber(value) {
+      if (!value) return 0;
+      
+      // Remove pontos e substitui vírgula por ponto
+      let cleaned = value.toString().replace(/\./g, '').replace(',', '.');
+      
+      // Extrai apenas números e ponto
+      let match = cleaned.match(/[\d.]+/g);
+      if (!match) return 0;
+      
+      return parseFloat(match[0]) || 0;
+    }
+
     // Função para mostrar notificações
     function showNotification(message, duration = 3000) {
       const notification = document.getElementById('notification');
@@ -268,26 +584,19 @@
       return String(text||'').replace(/[&<>\"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;" }[c])); 
     }
 
-    // Função para copiar texto para a área de transferência
+    // Função para copiar texto
     function copyToClipboard(text) {
       return new Promise((resolve, reject) => {
-        // Método moderno usando Clipboard API
         if (navigator.clipboard && window.isSecureContext) {
           navigator.clipboard.writeText(text)
             .then(() => resolve(true))
-            .catch(err => {
-              console.error('Erro ao copiar com Clipboard API:', err);
-              // Fallback para método antigo
-              fallbackCopyTextToClipboard(text, resolve, reject);
-            });
+            .catch(err => fallbackCopyTextToClipboard(text, resolve, reject));
         } else {
-          // Fallback para método antigo
           fallbackCopyTextToClipboard(text, resolve, reject);
         }
       });
     }
 
-    // Fallback para navegadores mais antigos
     function fallbackCopyTextToClipboard(text, resolve, reject) {
       const textArea = document.createElement('textarea');
       textArea.value = text;
@@ -300,11 +609,8 @@
       try {
         const successful = document.execCommand('copy');
         document.body.removeChild(textArea);
-        if (successful) {
-          resolve(true);
-        } else {
-          reject(new Error('Falha ao copiar texto'));
-        }
+        if (successful) resolve(true);
+        else reject(new Error('Falha ao copiar texto'));
       } catch (err) {
         document.body.removeChild(textArea);
         reject(err);
@@ -349,37 +655,80 @@
     function createRow(item, idx) {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><input class="desc" data-idx="${idx}" type="text" value="${escapeHtml(item.desc)}" placeholder="Descrição" /></td>
+        <td><input class="desc" data-idx="${idx}" type="text" value="${escapeHtml(item.desc)}" placeholder="Descrição do serviço/produto" /></td>
         <td><input class="qty" data-idx="${idx}" type="number" min="0" step="1" value="${item.qty}" /></td>
-        <td><input class="price" data-idx="${idx}" type="number" min="0" step="0.01" value="${item.price}" /></td>
+        <td><input class="price" data-idx="${idx}" type="text" value="${item.price.toFixed(2).replace('.', ',')}" placeholder="0,00" style="text-align: right;" /></td>
         <td class="right item-subtotal">${fmt(item.qty * item.price)}</td>
         <td class="item-actions">
-          <button class="small-btn del" data-idx="${idx}" title="Remover item">🗑️</button>
-          <button class="small-btn duplicate" data-idx="${idx}" title="Duplicar item">📋</button>
+          <button class="small-btn del" data-idx="${idx}" title="Remover item"><i class="fas fa-trash"></i></button>
+          <button class="small-btn duplicate" data-idx="${idx}" title="Duplicar item"><i class="fas fa-copy"></i></button>
         </td>
       `;
 
-      // Handlers para inputs - agora atualizam apenas a linha específica
-      tr.querySelectorAll('input').forEach(inp => {
+      // Evento para formatação monetária no campo de preço
+      const priceInput = tr.querySelector('.price');
+      
+      priceInput.addEventListener('focus', function() {
+        // Quando ganhar foco, mostra o valor sem formatação
+        let value = parseMoneyToNumber(this.value);
+        if (value === 0 && this.value === '') {
+          this.value = '';
+        } else {
+          this.value = value.toFixed(2).replace('.', ',');
+        }
+      });
+      
+      priceInput.addEventListener('blur', function() {
+        // Quando perder o foco, formata o valor
+        let numValue = parseMoneyToNumber(this.value);
+        let idx = this.dataset.idx;
+        
+        // Atualiza o valor no array de items
+        items[idx].price = numValue;
+        
+        // Atualiza o campo com valor formatado
+        this.value = numValue.toFixed(2).replace('.', ',');
+        
+        // Atualiza o subtotal da linha
+        updateRowSubtotal(idx);
+        
+        // Atualiza os totais
+        updateTotals();
+        
+        // Salva no localStorage
+        saveToLocalStorage();
+      });
+      
+      priceInput.addEventListener('input', function() {
+        // Permite apenas dígitos e vírgula durante a digitação
+        let cursorPos = this.selectionStart;
+        let value = this.value;
+        
+        // Substitui vírgula por ponto temporariamente para validação
+        let numericValue = value.replace(',', '.');
+        
+        // Permite apenas números e um único ponto
+        if (!/^[\d.]*$/.test(numericValue)) {
+          this.value = value.slice(0, -1);
+        }
+      });
+      
+      // Evento para outros inputs
+      tr.querySelectorAll('.desc, .qty').forEach(inp => {
         inp.addEventListener('input', e => {
           const i = Number(e.target.dataset.idx);
-          if (e.target.classList.contains('desc')) {
-            items[i].desc = e.target.value;
-          }
+          if (e.target.classList.contains('desc')) items[i].desc = e.target.value;
           if (e.target.classList.contains('qty')) {
-            items[i].qty = validateNumberInput(e.target, 0);
+            items[i].qty = parseInt(e.target.value) || 0;
+            if (items[i].qty < 0) items[i].qty = 0;
           }
-          if (e.target.classList.contains('price')) {
-            items[i].price = validateNumberInput(e.target, 0);
-          }
-          // Atualiza apenas o subtotal desta linha
           updateRowSubtotal(i);
-          // Atualiza totais gerais
           updateTotals();
           saveToLocalStorage();
         });
-        
-        // Foco no próximo campo ao pressionar Enter
+      });
+      
+      tr.querySelectorAll('input').forEach(inp => {
         inp.addEventListener('keydown', e => {
           if (e.key === 'Enter') {
             const inputs = Array.from(tr.querySelectorAll('input'));
@@ -387,24 +736,20 @@
             if (currentIndex < inputs.length - 1) {
               inputs[currentIndex + 1].focus();
             } else {
-              // Se for o último campo, adiciona um novo item
               addNewItem();
             }
           }
         });
       });
       
-      // Handler para remover item
       tr.querySelector('.del').addEventListener('click', () => { 
         items.splice(idx, 1); 
         renderTable();
         showNotification('Item removido');
       });
       
-      // Handler para duplicar item
       tr.querySelector('.duplicate').addEventListener('click', () => { 
-        const originalItem = items[idx];
-        items.splice(idx + 1, 0, {...originalItem});
+        items.splice(idx + 1, 0, {...items[idx]});
         renderTable();
         showNotification('Item duplicado');
       });
@@ -412,28 +757,23 @@
       return tr;
     }
 
-    // Atualiza apenas o subtotal de uma linha específica
     function updateRowSubtotal(idx) {
       const row = elements.itemsBody.children[idx];
       if (!row) return;
-      
       const item = items[idx];
       const subtotalCell = row.querySelector('.item-subtotal');
-      if (subtotalCell) {
-        subtotalCell.textContent = fmt(item.qty * item.price);
-      }
+      if (subtotalCell) subtotalCell.textContent = fmt(item.qty * item.price);
     }
 
-    // Renderiza apenas a tabela (quando a estrutura muda)
     function renderTable() {
-      // Limpa e reconstrói a tabela
       elements.itemsBody.innerHTML = '';
       
       if (items.length === 0) {
         elements.itemsBody.innerHTML = `
           <tr>
             <td colspan="5" class="empty-state">
-              📝 Nenhum item adicionado. Clique em "Adicionar item" para começar.
+              <i class="fas fa-box-open" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+              Nenhum item adicionado. Clique em "Adicionar item" para começar.
             </td>
           </tr>
         `;
@@ -441,13 +781,10 @@
         items.forEach((it, i) => elements.itemsBody.appendChild(createRow(it, i)));
       }
       
-      // Atualiza totais
       updateTotals();
     }
 
-    // Atualiza apenas os totais
     function updateTotals() {
-      // Calcula totais
       const subtotal = items.reduce((s, it) => s + (it.qty * it.price), 0);
       const taxPerc = Number(elements.tax.value) || 0;
       const discountPerc = Number(elements.discount.value) || 0;
@@ -455,31 +792,28 @@
       const discountAmount = subtotal * (discountPerc / 100);
       const total = subtotal + taxAmount - discountAmount;
 
-      // Atualiza elementos de exibição
       elements.subtotal.textContent = fmt(subtotal);
       elements.taxAmount.textContent = fmt(taxAmount);
       elements.discountAmount.textContent = fmt(discountAmount);
       elements.total.textContent = fmt(total >= 0 ? total : 0);
     }
 
-    // Adiciona um novo item
     function addNewItem() {
       items.push({ desc: '', qty: 1, price: 0 });
       renderTable();
       
-      // Foca no campo de descrição do novo item
       setTimeout(() => {
         const lastInput = elements.itemsBody.lastElementChild?.querySelector('.desc');
         if (lastInput) lastInput.focus();
       }, 10);
     }
 
-    // Constrói o texto do resumo para WhatsApp
     function buildSummaryText() {
-      const company = elements.company.value || 'Não informado';
+      const company = elements.company.value || 'STI - Soluções Técnicas Integradas';
       const client = elements.client.value || 'Não informado';
       const validity = Number(elements.validity.value) || 7;
       const notes = elements.notes.value || 'Nenhuma observação adicional.';
+      const phone = elements.phone.value || '';
 
       const subtotal = items.reduce((s, it) => s + (it.qty * it.price), 0);
       const taxPerc = Number(elements.tax.value) || 0;
@@ -488,63 +822,67 @@
       const discountAmount = subtotal * (discountPerc / 100);
       const total = subtotal + taxAmount - discountAmount;
 
-      // Usar emojis mais compatíveis e garantir codificação UTF-8
       let text = "";
       
-      // Cabeçalho
-      text += `*ORÇAMENTO* \n`;
-      text += `==============================\n\n`;
+      text += `STI – SOLUÇÕES TÉCNICAS INTEGRADAS\n`;
+      text += `==============================\n`;
+      text += `ORÇAMENTO\n\n`;
       
-      // Informações básicas
-      text += `*Empresa:* ${company} \n`;
-      text += `*Cliente:* ${client} \n`;
-      text += `*Validade:* ${validity} dias úteis \n\n`;
+      text += `EMPRESA:\n`;
+      text += `STI - Soluções Técnicas Integradas\n`;
+      text += `CNPJ: 63.897.187/0001-98\n`;
+      text += `Rua Eloy de Assis Fabris, 452 - Loja 04\n`;
+      text += `Novo Mundo, Curitiba - PR\n`;
+      text += `(41) 98808-3006\n`;
+      text += `contato@sti.seg.br\n\n`;
       
-      // Itens do orçamento
+      text += `CLIENTE:\n`;
+      text += `${client}\n`;
+      if (phone) text += `${phone}\n`;
+      text += `Validade: ${validity} dias úteis\n\n`;
+      
       if (items.length > 0) {
-        text += `*ITENS ORÇADOS* \n`;
+        text += `ITENS ORÇADOS\n`;
         text += `==============================\n`;
         
         items.forEach((it, i) => {
           const itemTotal = it.qty * it.price;
           text += `${i + 1}. ${it.desc || 'Item sem descrição'}\n`;
-          text += `   • Quantidade: ${it.qty}\n`;
-          text += `   • Preço unitário: ${fmt(it.price)}\n`;
-          text += `   → Subtotal: ${fmt(itemTotal)}\n\n`;
+          text += `   Quantidade: ${it.qty}\n`;
+          text += `   Preço unitário: ${fmt(it.price)}\n`;
+          text += `   Subtotal: ${fmt(itemTotal)}\n\n`;
         });
       }
       
-      // Resumo financeiro
-      text += `*RESUMO FINANCEIRO* \n`;
+      text += `RESUMO FINANCEIRO\n`;
       text += `==============================\n`;
       text += `Subtotal: ${fmt(subtotal)}\n`;
       
-      if (taxPerc > 0) {
-        text += `Imposto (${taxPerc}%): ${fmt(taxAmount)}\n`;
-      }
-      
-      if (discountPerc > 0) {
-        text += `Desconto (${discountPerc}%): ${fmt(discountAmount)}\n`;
-      }
+      if (taxPerc > 0) text += `Imposto (${taxPerc.toFixed(2)}%): ${fmt(taxAmount)}\n`;
+      if (discountPerc > 0) text += `Desconto (${discountPerc.toFixed(2)}%): ${fmt(discountAmount)}\n`;
       
       text += `\n`;
-      text += `*VALOR TOTAL: ${fmt(total >= 0 ? total : 0)}* \n\n`;
+      text += `VALOR TOTAL: ${fmt(total >= 0 ? total : 0)}\n\n`;
       
-      // Observações
-      text += `*OBSERVAÇÕES* \n`;
+      text += `OBSERVAÇÕES\n`;
       text += `==============================\n`;
       text += `${notes}\n\n`;
       
-      // Rodapé
-      text += `Este orçamento foi gerado automaticamente e possui validade de ${validity} dias.\n\n`;
-      text += `Data de emissão: ${new Date().toLocaleDateString('pt-BR')} \n`;
-      text += `Horário: ${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})} \n\n`;
-      text += `Agradecemos sua preferência! `;
+      text += `GARANTIA\n`;
+      text += `• 90 dias para serviços realizados\n`;
+      text += `• 1 ano para equipamentos (conforme fornecedor)\n\n`;
+      
+      text += `ATENDIMENTO\n`;
+      text += `• Resposta ao cliente em até 10 minutos\n`;
+      text += `• Agendamento com confirmação 24h antes\n\n`;
+      
+      text += `Este orçamento tem validade de ${validity} dias.\n`;
+      text += `Data de emissão: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}\n\n`;
+      text += `STI – Soluções Técnicas Integradas para seu negócio`;
       
       return text;
     }
 
-    // Salva dados no localStorage
     function saveToLocalStorage() {
       const data = {
         company: elements.company.value,
@@ -556,16 +894,15 @@
         notes: elements.notes.value,
         items: items
       };
-      localStorage.setItem('budgetCalculatorData', JSON.stringify(data));
+      localStorage.setItem('stiBudgetData', JSON.stringify(data));
     }
 
-    // Carrega dados do localStorage
     function loadFromLocalStorage() {
-      const savedData = localStorage.getItem('budgetCalculatorData');
+      const savedData = localStorage.getItem('stiBudgetData');
       if (savedData) {
         try {
           const data = JSON.parse(savedData);
-          elements.company.value = data.company || '';
+          elements.company.value = data.company || 'STI - Soluções Técnicas Integradas';
           elements.client.value = data.client || '';
           elements.validity.value = data.validity || 7;
           elements.tax.value = data.tax || 0;
@@ -574,14 +911,12 @@
           elements.notes.value = data.notes || '';
           items = data.items || [];
           renderTable();
-          showNotification('Dados recuperados do armazenamento local');
         } catch (e) {
           console.error('Erro ao carregar dados salvos:', e);
         }
       }
     }
 
-    // Exporta dados para arquivo
     function exportData() {
       const data = {
         company: elements.company.value,
@@ -600,50 +935,35 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `orcamento-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `orcamento-sti-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      showNotification('Orçamento salvo como arquivo');
+      showNotification('Orçamento salvo com sucesso!');
     }
 
-    // Abre o WhatsApp com a mensagem pré-preenchida
     function openWhatsAppWithMessage() {
       const phone = (elements.phone.value || '').replace(/\D/g, '');
       const text = buildSummaryText();
-      
-      // Codificar o texto para URL
       const encodedText = encodeURIComponent(text);
       
-      let url = '';
+      // Usar o número do cliente se disponível, caso contrário usar o número da STI
+      let url = phone.length >= 10 
+        ? `https://wa.me/${phone}?text=${encodedText}`
+        : `https://wa.me/5541988083006?text=${encodedText}`; // Número da STI como fallback
       
-      if (phone.length >= 8) {
-        // Se tem telefone, abre conversa específica com mensagem
-        url = `https://wa.me/${phone}?text=${encodedText}`;
-      } else {
-        // Se não tem telefone, abre WhatsApp com mensagem pronta
-        url = `https://wa.me/?text=${encodedText}`;
-      }
-      
-      // Abre em uma nova janela
+      // Tentar abrir o WhatsApp
       const newWindow = window.open(url, '_blank');
       
       if (newWindow) {
-        showNotification('WhatsApp aberto com a mensagem pré-preenchida!');
+        showNotification('WhatsApp aberto com o orçamento!');
       } else {
-        showNotification('WhatsApp aberto! A mensagem foi copiada para sua área de transferência.');
-        
-        // Se a janela não abriu, copia para área de transferência como fallback
+        // Se o popup for bloqueado, copiar para área de transferência
         copyToClipboard(text)
-          .then(() => {
-            showNotification('Mensagem copiada! Cole no WhatsApp (Ctrl+V).');
-          })
-          .catch(err => {
-            console.error('Erro ao copiar:', err);
-            showNotification('Erro ao copiar automaticamente. Copie manualmente a mensagem.');
-          });
+          .then(() => showNotification('Mensagem copiada! Cole no WhatsApp.'))
+          .catch(() => showNotification('Erro ao copiar. Copie manualmente.'));
       }
     }
 
@@ -658,49 +978,42 @@
       }
     });
     
-    elements.tax.addEventListener('input', updateTotals);
-    elements.discount.addEventListener('input', updateTotals);
+    elements.tax.addEventListener('input', () => {
+      updateTotals();
+      saveToLocalStorage();
+    });
+    
+    elements.discount.addEventListener('input', () => {
+      updateTotals();
+      saveToLocalStorage();
+    });
     
     elements.copyBtn.addEventListener('click', () => {
-      const summary = buildSummaryText();
-      copyToClipboard(summary)
-        .then(() => {
-          showNotification('Resumo copiado para a área de transferência!');
-        })
-        .catch(err => {
-          console.error('Erro ao copiar:', err);
-          showNotification('Erro ao copiar. Tente novamente ou use Ctrl+C manualmente.');
-        });
+      copyToClipboard(buildSummaryText())
+        .then(() => showNotification('Resumo copiado!'))
+        .catch(() => showNotification('Erro ao copiar.'));
     });
 
-    elements.printBtn.addEventListener('click', () => {
-      window.print();
-    });
+    elements.printBtn.addEventListener('click', () => window.print());
     
     elements.saveBtn.addEventListener('click', exportData);
+    
+    elements.whatsappBtn.addEventListener('click', openWhatsAppWithMessage);
 
-    elements.whatsappBtn.addEventListener('click', () => {
-      openWhatsAppWithMessage();
-    });
-
-    // Inicialização
     function init() {
-      // Carrega dados salvos
       loadFromLocalStorage();
       
-      // Adiciona um item de exemplo se não houver dados salvos
       if (items.length === 0) {
         items.push({ desc: '', qty: 1, price: 0.00 });
         renderTable();
       }
       
-      // Adiciona evento para salvar automaticamente quando campos são alterados
+      // Adicionar eventos para salvar no localStorage
       ['company', 'client', 'validity', 'phone', 'notes'].forEach(id => {
         document.getElementById(id).addEventListener('input', saveToLocalStorage);
       });
     }
 
-    // Inicia a aplicação
     init();
   </script>
 </body>
